@@ -1,0 +1,43 @@
+Import('env lib_NAME')
+
+FILES = ['kcrypt.c',
+         'kcsymkey.c',
+         'kcpki.c',
+         'kcpkey.c',
+         'kcskey.c',
+        ]
+
+
+FILES.append(env.ExtractSerializable(target = "kcrypt_serializable_array.c", source = FILES))
+
+install_HEADERS = ['kcrypt.h',
+                   'kcsymkey.h',
+                   'kcpki.h',
+                   'kcpkey.h',
+                   'kcskey.h',
+                  ]
+
+
+shared_OBJS = []
+static_OBJS = []
+for s in FILES:
+    shared_OBJS.append(env.SharedObject(s))
+    static_OBJS.append(env.StaticObject(s))
+
+shared_LIBS = [env.SharedLibrary(target = lib_NAME,
+                                 source = shared_OBJS,
+                                 LINKFLAGS= '-Wl,-soname,' + lib_NAME + '.so.$BASE_VERSION')]
+
+static_LIBS = [env.StaticLibrary(target = lib_NAME,
+                                 source = static_OBJS)]
+
+OBJS = shared_OBJS + static_OBJS
+
+install = []
+installed_so = env.InstallAs(target = '$LIBDIR/' + lib_NAME + '.so.$VERSION', source = shared_LIBS)
+install.append(installed_so)
+install.append(env.Link(target = ['$LIBDIR/' + lib_NAME + '.so.$BASE_VERSION', '$LIBDIR/' +lib_NAME + '.so'], source = installed_so))
+install.append(env.Install(dir = '$LIBDIR', source = static_LIBS))
+install.append(env.Install(dir = '$INCDIR', source = install_HEADERS))
+
+Return('shared_LIBS static_LIBS OBJS install')

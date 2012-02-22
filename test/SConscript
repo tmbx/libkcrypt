@@ -1,0 +1,17 @@
+Import('env static_LIBS lib_NAME')
+
+FILES = ['test.c',
+         'kcsymkey.c',
+         'kcpki.c',
+        ]
+
+FILES.append(env.ExtractTests(source = FILES, target = "unit_test.c"))
+
+OBJS = []
+for s in FILES:
+    OBJS.append(env.Object(s))
+
+env.Append(LINKFLAGS = '-rdynamic -ldl')
+PROGS = [env.Program(target = 'test', source = OBJS + static_LIBS)]
+
+Return('OBJS PROGS')
