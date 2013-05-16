@@ -1,4 +1,4 @@
-/**
+0/**
  * kcpkey.h
  * Copyright (C) 2006-2012 Opersys inc., All rights reserved.
  *
